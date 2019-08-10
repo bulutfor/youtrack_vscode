@@ -1,0 +1,134 @@
+{
+    "name": "youtrack",
+    "displayName": "YouTrack",
+    "description": "YouTrack issue list and create for VSCode.",
+    "version": "0.0.16",
+    "publisher": "bulut4",
+    "engines": {
+        "vscode": "^1.15.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bulut4/vscode_youtrack"
+    },
+    "icon": "images/youtrack.png",
+    "author": {
+        "name": "bulut4",
+        "url": "http://www.bulut4.com",
+        "email": "support@bulut4.com"
+    },
+    "keywords": [
+        "youtrack",
+        "issue",
+        "task",
+        "bulut4",
+        "gitlab"
+    ],
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "*"
+    ],
+    "main": "./out/src/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "youtrack.list",
+                "title": "YouTrack: List"
+            },
+            {
+                "command": "youtrack.closeIssue",
+                "title": "YouTrack: Close Active Issue"
+            },
+            {
+                "command": "youtrack.triggerGitlabPipeLine",
+                "title": "YouTrack: Trigger Gitlab CI/CD PipeLine"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "Youtrack extension configuration",
+            "properties": {
+                "youtrack.userName": {
+                    "type": "string",
+                    "default": "",
+                    "description": "YouTrack user name."
+                },
+                "youtrack.password": {
+                    "type": "string",
+                    "default": "",
+                    "description": "YouTrack password."
+                },
+                "youtrack.host": {
+                    "type": "string",
+                    "default": "",
+                    "description": "YouTrack server host address. Eg: xyz.jetbrains.com"
+                },
+                "youtrack.path": {
+                    "type": "string",
+                    "default": "/youtrack",
+                    "description": "YouTrack server path. Eg: /youtrack"
+                },
+                "youtrack.filter": {
+                    "type": "string",
+                    "default": "",
+                    "description": "YouTrack search query. It's using on issue list. Eg: (assigned to: me or Assignee: me) and #Unresolved and sort by: updated"
+                },
+                "youtrack.closeIssueActionType": {
+                    "type": "string",
+                    "enum": [
+                        "merge",
+                        "mergeRequestGitLab"
+                    ],
+                    "default": "merge",
+                    "description": "If set merge option, this extension merge branch to master branch on close issue command. Setting mergeRequestGitLab option, extension create to merge request using GitLab API."
+                },
+                "youtrack.gitLabPrivateToken": {
+                    "type": "string",
+                    "default": "",
+                    "description": "GitLab private token for merge request."
+                },
+                "youtrack.gitLabProjectId": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ],
+                    "default": null,
+                    "description": "GitLab project id for merge request."
+                },
+                "youtrack.closeIssueTriggerGitLabPipeLine": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Close issue on trigger gitlab ci pipeline. If set true you must set GitLab Pipeline Trigger Token."
+                },
+                "youtrack.gitLabPipelineTriggerToken": {
+                    "type": "string",
+                    "default": null,
+                    "description": "Gitlab Pipeline Trigger Token more information https://docs.gitlab.com/ee/ci/triggers/"
+                }
+            }
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "tsc -p ./",
+        "compile": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "@types/mocha": "^2.2.32",
+        "@types/node": "^6.0.40",
+        "@types/pug": "^2.0.4",
+        "@types/xml2js": "^0.4.0",
+        "mocha": "^2.3.3",
+        "typescript": "^2.0.3",
+        "vscode": "^1.1.33"
+    },
+    "dependencies": {
+        "moment": "^2.24.0",
+        "node-gitlab": "^1.6.1",
+        "pug": "^2.0.0-rc.3",
+        "xml2js": "^0.4.19"
+    }
+}
