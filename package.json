@@ -2,14 +2,14 @@
     "name": "youtrack",
     "displayName": "YouTrack",
     "description": "YouTrack issue list and create for VSCode.",
-    "version": "0.0.16",
+    "version": "0.0.17",
     "publisher": "bulut4",
     "engines": {
         "vscode": "^1.15.0"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/bulut4/vscode_youtrack"
+        "url": "https://github.com/bulutfor/youtrack_vscode"
     },
     "icon": "images/youtrack.png",
     "author": {
