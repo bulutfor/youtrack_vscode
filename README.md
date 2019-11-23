@@ -83,4 +83,8 @@ Youtrack issue list problem fixed.
 
 Time tracking added. Close issue command, add spent time on Youtrack. You see spent time on Youtrack extension status bar text tooltip. Must before you set time tracking settings activated on YouTrack.
 
+### 0.0.18
+
+Bug fixed and added log event channel.
+
 **Enjoy!**

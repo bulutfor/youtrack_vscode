@@ -17,6 +17,7 @@ const childProcess = require("child_process");
 const nodeGitLab = require("node-gitlab");
 const querystring = require("querystring");
 const moment = require("moment");
+const ytLog = vscode.window.createOutputChannel('Youtrack');
 function activate(context) {
     let globalIssues;
     class _git {
@@ -115,7 +116,7 @@ function activate(context) {
     }
     function statusUpdate() {
         let duration = moment.duration(registryJSON['spentTime'] || 0);
-        status.tooltip = `Spent Time: ${duration.humanize()}`;
+        status.text = `YT: ${registryJSON['currentBranch']} Spent Time: ${duration.humanize()}`;
     }
     function addSpentTimes() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -229,6 +230,7 @@ function activate(context) {
                     else
                         reject(data);
                 });
+                res.on('err', err => reject(err));
             });
             postReq.write(querystring.stringify({ token: token, ref: ref }));
             postReq.end();
@@ -252,20 +254,27 @@ function activate(context) {
         }
         else if (actionType === 'mergeRequestGitLab') {
             try {
+                status.text = 'YT:Gitlab login';
                 let gitLabClient = nodeGitLab.createPromise({
                     api: 'https://gitlab.com/api/v4',
                     privateToken: config.get('gitLabPrivateToken', '')
                 });
+                status.text = 'YT:Merge request create';
                 let mergeRequest = yield gitLabClient.mergeRequests.create({
                     id: config.get('gitLabProjectId', null),
                     source_branch: registryJSON['currentBranch'],
                     target_branch: registryJSON['parentBranch'],
                     title: 'Issue ' + registryJSON['currentBranch']
                 });
+                status.text = 'YT:Git checkout';
                 yield git.checkout(registryJSON['parentBranch']);
+                status.text = 'YT:Git delete branch';
                 yield git.deleteBranch(registryJSON['currentBranch']);
+                status.text = 'YT:Set state fixed';
                 yield yt.setState(registryJSON['currentBranch'], 'Fixed');
+                status.text = 'YT:Add spent times';
                 yield addSpentTimes();
+                status.text = 'Youtrack';
                 delete registryJSON['parentBranch'];
                 delete registryJSON['opened'];
                 delete registryJSON['currentBranch'];
@@ -309,11 +318,18 @@ function activate(context) {
         status.text = 'Youtrack';
     })));
     context.subscriptions.push(vscode.commands.registerCommand('youtrack.list', () => {
+        status.text = 'YT:Login';
         yt.login()
             .then(() => yt.getIssue()
             .then(issues => {
+            status.text = 'YT:Get issues';
             let prs = new xml2js.Parser();
             prs.parseString(issues, ((err, res) => {
+                if (err) {
+                    ytLog.appendLine('YT:ParseString:' + err.stack);
+                    vscode.window.showErrorMessage('Youtrack issues list error:' + err.message);
+                    return;
+                }
                 globalIssues = res;
                 const panel = vscode.window.createWebviewPanel('youtrackIssueList', 'Youtrack Issue List', vscode.ViewColumn.Two, {
                     enableScripts: true
@@ -335,7 +351,11 @@ function activate(context) {
                     vscode.window.showErrorMessage(reason);
                 });*/
             }));
-        }));
+        }))
+            .catch(err => {
+            ytLog.appendLine('YT:Login:' + err.stack);
+            vscode.window.showErrorMessage('Youtrack login error:' + err.message);
+        });
     }));
     context.subscriptions.push(vscode.commands.registerCommand('youtrack.triggerGitlabPipeLine', () => __awaiter(this, void 0, void 0, function* () {
         let token = config.get('gitLabPipelineTriggerToken', '');
@@ -408,10 +428,13 @@ class youTrack {
                             self._login = true;
                             resolve(data);
                         }
+                        else
+                            reject(new Error('User name or password is incorrect.'));
                     }
                     else
                         resolve(data);
                 });
+                res.on('error', err => reject(err));
             });
             if (data !== null) {
                 postReq.write(data);
@@ -423,28 +446,32 @@ class youTrack {
         let self = this;
         return new Promise((resolve, reject) => {
             self.httpPost('/rest/user/login?login=' + encodeURIComponent(self.userName) + '&password=' + encodeURI(self.password), 'POST')
-                .then(() => resolve());
+                .then(() => resolve())
+                .catch(err => reject(err));
         });
     }
     getIssue() {
         let self = this;
         return new Promise((resolve, reject) => {
             self.httpPost('/rest/issue?filter=' + encodeURIComponent(self.filter) + '&max=100', 'GET')
-                .then(data => resolve(data));
+                .then(data => resolve(data))
+                .catch(err => reject(err));
         });
     }
     setState(issueId, state) {
         let self = this;
         return new Promise((resolve, reject) => {
             self.httpPost('/rest/issue/' + issueId + '/execute?command=' + encodeURIComponent('State ' + state), 'POST')
-                .then(data => resolve(data));
+                .then(data => resolve(data))
+                .catch(err => reject(err));
         });
     }
     setEstimate(issueId, estimate) {
         let self = this;
         return new Promise((resolve, reject) => {
             self.httpPost('/rest/issue/' + issueId + '/execute?command=' + encodeURIComponent('Estimation ' + estimate), 'POST')
-                .then(data => resolve(data));
+                .then(data => resolve(data))
+                .catch(err => reject(err));
         });
     }
     addSpent(issueId, date, time) {
@@ -459,7 +486,8 @@ class youTrack {
                 </worktype>
             </workItem>
             `)
-                .then(data => resolve(data));
+                .then(data => resolve(data))
+                .catch(err => reject(err));
         });
     }
 }
