@@ -2,7 +2,7 @@
     "name": "youtrack",
     "displayName": "YouTrack",
     "description": "YouTrack issue list and create for VSCode.",
-    "version": "0.0.21",
+    "version": "0.0.22",
     "publisher": "bulut4",
     "engines": {
         "vscode": "^1.34.0"
@@ -118,17 +118,16 @@
     "devDependencies": {
         "@types/mocha": "^2.2.32",
         "@types/node": "^6.0.40",
-        "@types/vscode": "^1.34.0",
-        "@types/xml2js": "^0.4.0",
         "mocha": "^6.2.2",
-        "typescript": "^2.0.3"
+        "typescript": "^2.0.3",
+        "vsce": "^1.69.0",
+        "vscode-test": "^1.2.3"
     },
     "dependencies": {
-        "@types/pug": "^2.0.4",
+        "pug": "^2.0.4",
+        "@types/vscode": "^1.34.0",
+        "xml2js": "^0.4.22",
         "moment": "^2.24.0",
-        "node-gitlab": "^1.6.1",
-        "vsce": "^1.69.0",
-        "vscode-test": "^1.2.3",
-        "xml2js": "^0.4.22"
+        "node-gitlab": "^1.6.1"
     }
 }

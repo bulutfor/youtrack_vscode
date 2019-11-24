@@ -153,8 +153,14 @@ export function activate(context: vscode.ExtensionContext) {
     }
     
     // const myExtDir = vscode.extensions.getExtension('bulut4.youtrack').extensionPath;
-    let path = vscode.workspace.rootPath;
-    if (path === undefined || path === '' || path === null) return; // workspace not found.
+    let wsf = vscode.workspace.workspaceFolders;
+    let path;
+    if (wsf !== undefined && wsf.length > 0) {
+        path = wsf[0].uri;
+    } else {
+        vscode.window.showErrorMessage('Youtrack extension only running on workspace.');
+        return;
+    }
     registryJSONPath = path + '/.vscode/youtrackRegistry.json';
     fs.readFile(registryJSONPath, 'utf-8', (err, data) => {
         if (!err) {
