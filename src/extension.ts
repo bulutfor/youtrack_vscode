@@ -156,7 +156,7 @@ export function activate(context: vscode.ExtensionContext) {
     let wsf = vscode.workspace.workspaceFolders;
     let path;
     if (wsf !== undefined && wsf.length > 0) {
-        path = wsf[0].uri;
+        path = wsf[0].uri.path;
     } else {
         vscode.window.showErrorMessage('Youtrack extension only running on workspace.');
         return;
