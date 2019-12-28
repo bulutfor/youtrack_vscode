@@ -228,6 +228,7 @@ export function activate(context: vscode.ExtensionContext) {
                     });
                     res.on('err', err => reject(err));
                 });
+                postReq.on('error', err => reject(err));
                 postReq.write(querystring.stringify({token: token, ref: ref}));
                 postReq.end();
             });
@@ -409,11 +410,11 @@ class youTrack {
     public basePath: string;
 
     constructor(userName: string, password: string, host: string, filter: string, path: string) {
-        this.host = host;
+        this.host = host.replace('https://', '');
         this.userName = userName;
         this.password = password;
         this.filter = filter;
-        this.basePath = path;
+        this.basePath = path === '/' ? '' : path;
     }
 
     private httpPost(path: string, method: string, data: any = null) {
@@ -451,6 +452,7 @@ class youTrack {
                 });
                 res.on('error', err => reject(err));
             });
+            postReq.on('error', err => reject(err));
             if (data !== null) {
                 postReq.write(data);
             }
