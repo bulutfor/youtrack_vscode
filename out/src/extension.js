@@ -414,9 +414,9 @@ class youTrack {
         let spentRequest = path.indexOf('/timetracking/workitem') > -1;
         return new Promise((resolve, reject) => {
             let options = {
-                host: this.host,
+                host: this.host.replace('https://', ''),
                 port: 443,
-                path: self.basePath + path,
+                path: self.basePath !== '/' ? self.basePath + path : path,
                 method: method,
                 headers: {
                     'Content-Type': (spentRequest ? 'application/xml' : 'application/json'),
@@ -447,6 +447,9 @@ class youTrack {
                 });
                 res.on('error', err => reject(err));
             });
+            
+            postReq.on('error', err => reject(err));
+            
             if (data !== null) {
                 postReq.write(data);
             }
