@@ -1,9 +1,10 @@
 'use strict';
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -239,6 +240,7 @@ function activate(context) {
                     });
                     res.on('err', err => reject(err));
                 });
+                postReq.on('error', err => reject(err));
                 postReq.write(querystring.stringify({ token: token, ref: ref }));
                 postReq.end();
             });
@@ -402,11 +404,11 @@ exports.deactivate = deactivate;
 class youTrack {
     constructor(userName, password, host, filter, path) {
         this._login = false;
-        this.host = host;
+        this.host = host.replace('https://', '');
         this.userName = userName;
         this.password = password;
         this.filter = filter;
-        this.basePath = path;
+        this.basePath = path === '/' ? '' : path;
     }
     httpPost(path, method, data = null) {
         let self = this;
@@ -447,6 +449,7 @@ class youTrack {
                 });
                 res.on('error', err => reject(err));
             });
+            postReq.on('error', err => reject(err));
             if (data !== null) {
                 postReq.write(data);
             }
