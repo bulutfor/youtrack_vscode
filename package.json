@@ -123,13 +123,13 @@
         "vscode-test": "^1.2.3",
         "@types/pug": "^2.0.4",
         "xml2js": "^0.4.22",
-        "moment": "^2.24.0",
+        "moment": "^2.29.2",
         "node-gitlab": "^1.6.1"
     },
     "dependencies": {
         "xml2js": "^0.4.22",
         "pug": "^2.0.0",
-        "moment": "^2.24.0",
+        "moment": "^2.29.2",
         "node-gitlab": "^1.6.1"
     }
 }
